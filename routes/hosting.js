@@ -2,14 +2,14 @@ const router = require('express').Router();
 const {
     obtenerHosting,
     obtenerHostings,
-    registrarHosting,
+    crearHosting,
     modificarHosting,
     eliminarHosting
-} = require('../controllers/dominio');
+} = require('../controllers/hosting');
 
 router.get('/', obtenerHostings);
 router.get('/:id', obtenerHosting);
-router.post('/', registrarHosting);
+router.post('/', crearHosting);
 router.put('/:id', modificarHosting);
 router.delete('/:id', eliminarHosting);
 
