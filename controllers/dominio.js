@@ -1,64 +1,195 @@
-let obtenerDominio = (req, res, next) => {
+let obtenerDominio = async (req, res, next) => {
+    //TODO
+    //Opción para obtener el ID desde el token
     let id = req.params.id;
-    //TODO
-    //Buscar dominio en la base de datos
-    //Regresar dominio
-    res.status(200).json({
-        msg : `Get, obtener uno`,
-        id
-    });
+    let domain = req.query.d;
+    //Verifica que el ID y el nombre de dominio venga en la petición
+    if(!id || !domain){
+        return res.status(400).json({
+            error : {
+                msg : 'El ID del usuario y el nombre de dominio son necesarios'
+            }
+        });
+    }
+    try {
+        //Busca el dominio del usuario
+        const dominio = await Dominio.findOne({
+            where: {
+                id_usuario : id,
+                domain
+            }
+        });
+        //Verifica que el usuario tenga el dominio registrado
+        if(!dominio){ 
+            return res.status(404).json({
+                error: {
+                    msg : `Este usuario no tiene el dominio ${id} registrado`
+                }
+            });
+        }
+        //Regresar dominio
+        res.status(200).json({
+            dominio
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
+    }
 }
 
-let obtenerDominios = (req, res, next) => {
+let obtenerDominios = async (req, res, next) => {
     //TODO
-    //Buscar dominios en la BD
-    //Regresar dominios
-    res.status(200).json({
-        msg : `Get, obtener todos`,
-        obj : []
-    });
+    //Opción para obtener dominio desde el token
+    let id = req.query.id;
+    let domain = req.query.d;
+    //Verifica que el ID y el nombre de dominio venga en la petición
+    if(!id || !domain){
+        return res.status(400).json({
+            error : {
+                msg : 'El ID del usuario y el nombre de dominio son necesarios'
+            }
+        });
+    }
+    try {
+        //Busca dominios en la BD
+        const dominios = await Dominio.findAll({
+            where: {
+                id_usuario : id,
+                domain
+            }
+        });
+        //Regresar dominios
+        res.status(200).json({
+            dominios
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
+    }
 }
 
-let registrarDominio = (req, res, next) => {
+let registrarDominio = async (req, res, next) => {
     let body = req.body;
     //TODO
     //Verificar datos
     //Enviar petición a GoDaddy
     //Evaluar respuesta
-    //Cobrar al usuario
-    //Regresar datos al usuario
-    res.status(201).json({
-        msg : `Post, crear uno`,
-        obj : body
-    })
+    //Sí
+        //Guardar datos en BD
+        //Cobrar al usuario
+        //Regresar datos al usuario
+        res.status(201).json({
+            msg : `Post, crear uno`,
+            obj : body
+        });
+    //No
+        //Guardar datos en BD en caso de ser necesario
+        //Regresar datos de error al usuario
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
 }
 
-let modificarDominio = (req, res, next) => {
+let modificarDominio = async (req, res, next) => {
     let id = req.params.id;
     let body = req.body;
     //TODO
     //Verificar datos
     //Enviar petición a GoDaddy
     //Evaluar respuesta
-    //Regresar datos al usuario
-    res.status(200).json({
-        msg: `Put, Modificar uno`,
-        obj : body,
-        id
-    })
+    //Sí
+        //Guardar cambios en la BD
+        //Cobrar al usuario en caso de ser necesario
+        //Regresar datos al usuario
+        res.status(200).json({
+            msg: `Put, Modificar uno`,
+            obj : body,
+            id
+        });
+    //No
+        //Guardar datos en BD en caso de ser necesario
+        //Regresar datos de error al usuario
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
 }
 
-let eliminarDominio = (req, res, next) => {
+let eliminarDominio = async (req, res, next) => {
     let id = req.params.id;
-    //TODO
-    //Verificar datos
+    let domain = req.query.d;
+    //Verifica que el ID  y el nombre de dominio venga en la petición
+    if(!id || !domain){
+        return res.status(400).json({
+            error : {
+                msg : 'El ID del usuario y el nombre de dominio son necesarios'
+            }
+        });
+    }
     //Enviar petición a GoDaddy
     //Evaluar respuesta
-    //Regresar datos al usuario
-    res.status(200).json({
-        msg : `Delete, Eliminar uno`,
-        id
-    })
+    //Sí
+        //Cobrar al usuario en caso de ser necesario
+        try {
+            //Busca el usuario en BD
+            const usuario = await Afiliado.findByPk(id);
+            if(!usuario) {
+                return res.status(404).json({
+                    error : {
+                        msg : 'Usuario no encontrado'
+                    }
+                });
+            }
+            //Busca el dominio del usuario
+            const dominio = await Dominio.findOne({
+                //TODO
+                //Agregar el dominio en la consulta
+                where: {
+                    id_cuenta : id
+                }
+            });
+            //Verifica que el usuario tenga el dominio registrado
+            if(!dominio){ 
+                return res.status(404).json({
+                    error: {
+                        msg : `Este usuario no tiene el dominio ${id} registrado`
+                    }
+                });
+            }
+            //Opción de eliminar físicamente dominio
+            dominio.destroy();
+            //TODO
+            //Opción de eliminar lógicamente dominio
+            //Se envía la respuesta
+            res.status(200).send(`Dominio del usuario ${id} eliminado`);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                error : {
+                    msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+                }
+            });
+        }   
+    //No
+        //Cobrar al usuario en caso de ser necesario
+        //Guardar datos en BD en caso de ser necesario
+        //Regresar datos de error al usuario
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
 }
 
 module.exports = {

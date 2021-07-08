@@ -29,7 +29,7 @@ let crearHosting = (req, res, next) => {
     res.status(201).json({
         msg : `Post, crear uno`,
         obj : body
-    })
+    });
 }
 
 let modificarHosting = (req, res, next) => {
@@ -44,7 +44,7 @@ let modificarHosting = (req, res, next) => {
         msg: `Put, Modificar uno`,
         obj : body,
         id
-    })
+    });
 }
 
 let eliminarHosting = (req, res, next) => {
@@ -56,7 +56,7 @@ let eliminarHosting = (req, res, next) => {
     res.status(200).json({
         msg : `Delete, Eliminar uno`,
         id
-    })
+    });
 }
 
 module.exports = {
