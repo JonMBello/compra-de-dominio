@@ -1,6 +1,6 @@
 let obtenerDominio = async (req, res, next) => {
     //TODO
-    //Opción para obtener el ID desde el token
+    //Opción para obtener el ID desde el token y el dominio desde la URL
     let id = req.params.id;
     let domain = req.query.d;
     //Verifica que el ID y el nombre de dominio vengan en la petición
@@ -43,10 +43,10 @@ let obtenerDominio = async (req, res, next) => {
 
 let obtenerDominios = async (req, res, next) => {
     //TODO
-    //Opción para obtener dominio desde el token
+    //Opción para obtener ID desde el token
     let id = req.query.id;
     let domain = req.query.d;
-    //Verifica que el ID y el nombre de dominio venga en la petición
+    //Verifica que el ID y el nombre de dominio vengan en la petición
     if(!id || !domain){
         return res.status(400).json({
             error : {

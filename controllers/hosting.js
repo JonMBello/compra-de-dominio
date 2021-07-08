@@ -1,6 +1,8 @@
+const { query } = require("express");
+
 let obtenerHosting = (req, res, next) => {
     //TODO
-    //Opción para obtener ID desde el token
+    //Opción para obtener ID desde el token y el host desde la URL
     let id = req.params.id;
     let host = req.query.h;
     //Verifica que el ID del usuario y del host vengan en la petición
@@ -29,7 +31,7 @@ let obtenerHosting = (req, res, next) => {
         }
         //Regresar host
         res.status(200).json({
-            host
+            hosting
         });
     } catch (error) {
         console.log(error);
@@ -43,12 +45,37 @@ let obtenerHosting = (req, res, next) => {
 
 let obtenerHostings = (req, res, next) => {
     //TODO
-    //Buscar hostings en BD
-    //Regresar datos al usuario
-    res.status(200).json({
-        msg : `Get, obtener todos`,
-        obj : []
-    });
+    //Opción para obtener ID desde el token
+    let id = req.query.id;
+    let host = req.query.h;
+    //Verificar que el ID del usuario y del host vengan en la petición
+    if(!id || !host) {
+        return res.status(400).json({
+            error : {
+                msg : 'El ID del usuario y del host son necesarios'
+            }
+        });
+    }
+    try {
+        //Busca hosts en la BD
+        const hosting = await Host.findAll({
+            where : {
+                id_usuario : id,
+                id_host : host
+            }
+        });
+        //Regrsar dominios
+        res.status(200).json({
+            hosting
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error : {
+                msg : 'Error del sistema, intenta de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
+    }
 }
 
 let crearHosting = (req, res, next) => {
