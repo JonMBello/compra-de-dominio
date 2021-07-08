@@ -3,7 +3,7 @@ let obtenerDominio = async (req, res, next) => {
     //Opción para obtener el ID desde el token
     let id = req.params.id;
     let domain = req.query.d;
-    //Verifica que el ID y el nombre de dominio venga en la petición
+    //Verifica que el ID y el nombre de dominio vengan en la petición
     if(!id || !domain){
         return res.status(400).json({
             error : {
@@ -23,7 +23,7 @@ let obtenerDominio = async (req, res, next) => {
         if(!dominio){ 
             return res.status(404).json({
                 error: {
-                    msg : `Este usuario no tiene el dominio ${id} registrado`
+                    msg : `Este usuario no tiene el dominio ${domain} registrado`
                 }
             });
         }
