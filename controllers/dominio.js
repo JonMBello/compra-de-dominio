@@ -142,21 +142,11 @@ let eliminarDominio = async (req, res, next) => {
     //Sí
         //Cobrar al usuario en caso de ser necesario
         try {
-            //Busca el usuario en BD
-            const usuario = await Afiliado.findByPk(id);
-            if(!usuario) {
-                return res.status(404).json({
-                    error : {
-                        msg : 'Usuario no encontrado'
-                    }
-                });
-            }
             //Busca el dominio del usuario
             const dominio = await Dominio.findOne({
-                //TODO
-                //Agregar el dominio en la consulta
                 where: {
-                    id_cuenta : id
+                    id_cuenta : id,
+                    domain
                 }
             });
             //Verifica que el usuario tenga el dominio registrado
