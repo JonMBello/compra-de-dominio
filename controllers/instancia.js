@@ -1,35 +1,35 @@
 const { query } = require("express");
 
-let obtenerHosting = (req, res, next) => {
+let obtenerInstancia = (req, res, next) => {
     //TODO
     //Opción para obtener ID desde el token y el host desde la URL
     let id = req.params.id;
     let host = req.query.h;
-    //Verifica que el ID del usuario y del host vengan en la petición
+    //Verifica que el ID del usuario y de la instancia vengan en la petición
     if(!id || !host) {
         return res.status(400).json({
             error : {
-                msg : 'El ID del usuario y del host son necesarios'
+                msg : 'El ID del usuario y de la instancia son necesarios'
             }
         });
     }
     try {
-        //Busca el host del usuario
-        const hosting = await Host.findOne({
+        //Busca la instancia del usuario
+        const instancia = await Instancia.findOne({
             where : {
-                id_usuario : id,
-                id_host : host
+                Usr_ID : id,
+                Ins_ID : host
             }
         });
-        //Verifica que el usuario tenga el host registrado
-        if(!hosting){
+        //Verifica que el usuario tenga la instancia registrada
+        if(!instancia){
             return res.status(404).json({
                 error : {
-                    msg : `Este usuario no tiene el host ${host} registrado`
+                    msg : `Este usuario no tiene la instancia ${host} registrada`
                 }
             });
         }
-        //Regresar host
+        //Regresar instancia
         res.status(200).json({
             hosting
         });
@@ -43,30 +43,30 @@ let obtenerHosting = (req, res, next) => {
     }
 }
 
-let obtenerHostings = (req, res, next) => {
+let obtenerInstancias = (req, res, next) => {
     //TODO
     //Opción para obtener ID desde el token
     let id = req.query.id;
     let host = req.query.h;
-    //Verificar que el ID del usuario y del host vengan en la petición
+    //Verificar que el ID del usuario y de la instancia vengan en la petición
     if(!id || !host) {
         return res.status(400).json({
             error : {
-                msg : 'El ID del usuario y del host son necesarios'
+                msg : 'El ID del usuario y de la instancia son necesarios'
             }
         });
     }
     try {
         //Busca hosts en la BD
-        const hosting = await Host.findAll({
+        const instancias = await Instancia.findAll({
             where : {
-                id_usuario : id,
-                id_host : host
+                Usr_ID : id,
+                Ins_ID : host
             }
         });
         //Regrsar dominios
         res.status(200).json({
-            hosting
+            instancias
         });
     } catch (error) {
         console.log(error);
@@ -78,7 +78,7 @@ let obtenerHostings = (req, res, next) => {
     }
 }
 
-let crearHosting = (req, res, next) => {
+let crearInstancia = (req, res, next) => {
     let body = req.body;
     //TODO
     //Verificar datos
@@ -102,7 +102,7 @@ let crearHosting = (req, res, next) => {
         });
 }
 
-let modificarHosting = (req, res, next) => {
+let modificarInstancia = (req, res, next) => {
     let id = req.params.id;
     let body = req.body;
     //TODO
@@ -130,16 +130,16 @@ let modificarHosting = (req, res, next) => {
         });
 }
 
-let eliminarHosting = (req, res, next) => {
+let eliminarInstancia = (req, res, next) => {
     //TODO
     //Opción para obtener el ID del token
     let id = req.params.id;
     let host = req.query.h;
-    //Verifica que el ID del usuario y del host vengan en la petición
+    //Verifica que el ID del usuario y de la instancia vengan en la petición
     if(!id || !host){
         return res.status(400).json({
             error : {
-                msg : 'El ID del usuario y del host son necesarios'
+                msg : 'El ID del usuario y de la instancia son necesarios'
             }
         });
     }
@@ -149,26 +149,26 @@ let eliminarHosting = (req, res, next) => {
         //Cobrar al usuario en caso de ser necesario
         try {
             //Busca el host del usuario
-            const hosting = await Host.findOne({
+            const instancia = await Instancia.findOne({
                 where: {
-                    id_usuario : id,
-                    id_host : host
+                    Usr_ID : id,
+                    Ins_ID : host
                 }
             });
             //Verifica que el usuario tenga el dominio registrado
-            if(!hosting){ 
+            if(!instancia){ 
                 return res.status(404).json({
                     error: {
-                        msg : `Este usuario no tiene el host ${host} registrado`
+                        msg : `Este usuario no tiene la instancia ${host} registrada`
                     }
                 });
             }
-            //Opción de eliminar físicamente hosting
-            hosting.destroy();
+            //Opción de eliminar físicamente instancia
+            instancia.destroy();
             //TODO
-            //Opción de eliminar lógicamente hosting
+            //Opción de eliminar lógicamente instancia
             //Se envía la respuesta
-            res.status(200).send(`Hosting del usuario ${id} eliminado`);
+            res.status(200).send(`Instancia del usuario ${id} eliminada`);
         } catch (error) {
             console.log(error);
             res.status(500).json({
@@ -189,9 +189,9 @@ let eliminarHosting = (req, res, next) => {
 }
 
 module.exports = {
-    obtenerHosting,
-    obtenerHostings,
-    crearHosting,
-    modificarHosting,
-    eliminarHosting
+    obtenerInstancia,
+    obtenerInstancias,
+    crearInstancia,
+    modificarInstancia,
+    eliminarInstancia
 }

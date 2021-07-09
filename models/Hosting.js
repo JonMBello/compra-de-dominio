@@ -1,2 +1,0 @@
-//TODO
-//Modelo del hosting
