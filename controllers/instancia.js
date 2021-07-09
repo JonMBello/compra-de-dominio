@@ -1,6 +1,6 @@
 const { query } = require("express");
 
-let obtenerInstancia = (req, res, next) => {
+let obtenerInstancia = async (req, res, next) => {
     //TODO
     //Opción para obtener ID desde el token y el host desde la URL
     let id = req.params.id;
@@ -43,7 +43,7 @@ let obtenerInstancia = (req, res, next) => {
     }
 }
 
-let obtenerInstancias = (req, res, next) => {
+let obtenerInstancias = async (req, res, next) => {
     //TODO
     //Opción para obtener ID desde el token
     let id = req.query.id;
@@ -78,7 +78,7 @@ let obtenerInstancias = (req, res, next) => {
     }
 }
 
-let crearInstancia = (req, res, next) => {
+let crearInstancia = async (req, res, next) => {
     let body = req.body;
     //TODO
     //Verificar datos
@@ -102,7 +102,7 @@ let crearInstancia = (req, res, next) => {
         });
 }
 
-let modificarInstancia = (req, res, next) => {
+let modificarInstancia = async (req, res, next) => {
     let id = req.params.id;
     let body = req.body;
     //TODO
@@ -130,7 +130,7 @@ let modificarInstancia = (req, res, next) => {
         });
 }
 
-let eliminarInstancia = (req, res, next) => {
+let eliminarInstancia = async (req, res, next) => {
     //TODO
     //Opción para obtener el ID del token
     let id = req.params.id;

@@ -126,6 +126,8 @@ let modificarDominio = async (req, res, next) => {
         });
 }
 
+let renovarDominio = async (req, res, next) => {}
+
 let eliminarDominio = async (req, res, next) => {
     let id = req.params.id;
     let domain = req.query.d;
@@ -187,5 +189,6 @@ module.exports = {
     obtenerDominios,
     registrarDominio,
     modificarDominio,
+    renovarDominio,
     eliminarDominio
 }
