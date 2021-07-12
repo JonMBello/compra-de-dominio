@@ -1,7 +1,5 @@
-//TODO
-//Modelo del Usuario
 let {DataTypes} = require('sequelize');
-let {db} = require('../DB');
+let {db} = require('../db');
 
 const Usuario = db.define('Usuario', {
     Usr_NameFirst : {
@@ -33,7 +31,7 @@ const Usuario = db.define('Usuario', {
     },
     Usr_Phone : {
         type : DataTypes.STRING
-    },
+    }
 });
 
 module.exports = Usuario;
