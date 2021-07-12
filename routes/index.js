@@ -5,6 +5,6 @@ router.get('/', (req, res, next)=>{
 });
 
 router.use('/dominio', require('./dominio'));
-router.use('/hosting', require('./hosting'));
+router.use('/instancia', require('./instancia'));
 
 module.exports = router;
