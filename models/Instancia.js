@@ -1,5 +1,3 @@
-//TODO
-//Modelo de la Instancia
 let {DataTypes, Deferrable} = require('sequelize');
 let {db} = require('../db');
 const Usuario = require('./Usuario');
