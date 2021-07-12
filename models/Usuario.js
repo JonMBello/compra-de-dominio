@@ -2,6 +2,11 @@ let {DataTypes} = require('sequelize');
 let {db} = require('../db');
 
 const Usuario = db.define('Usuario', {
+    Usr_ID : {
+        type : DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true,
+    },
     Usr_NameFirst : {
         type : DataTypes.STRING
     },
@@ -32,6 +37,9 @@ const Usuario = db.define('Usuario', {
     Usr_Phone : {
         type : DataTypes.STRING
     }
+},
+{
+    tableName: 'Usuario'
 });
 
 module.exports = Usuario;
