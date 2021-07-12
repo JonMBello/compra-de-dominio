@@ -1,7 +1,8 @@
 const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
+//Importar modelo
 
-const validarJWT = (req = request, res = response, next) => {
+const validarJWT = async (req = request, res = response, next) => {
     const token = req.header('RF-token');
     if(!token){
         return res.status(401).json({
@@ -11,9 +12,16 @@ const validarJWT = (req = request, res = response, next) => {
         });
     }
     try {
-        const { Usr_ID, Usr_Email } = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
-        // req.Usr_ID = Usr_ID;
-        // req.Usr_Email = Usr_Email;
+        const { Usr_ID } = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
+        const usuario = await Usuario.findByID(Usr_ID);
+        if(!usuario) {
+            return res.status(404).json({
+                error: {
+                    msg : `No existe un usuario con este token`
+                }
+            });
+        }
+        req.usuario = usuario;
         next();
     } catch (error) {
         console.log(error);

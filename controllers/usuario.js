@@ -1,4 +1,4 @@
-let {generarJWT} = require ('../helpers/generar-jwt');
+const {generarJWT} = require ('../helpers/generar-jwt');
 
 //Login
 let iniciarSesion = async (req, res, next) => {
