@@ -2,24 +2,15 @@ const axios = require('axios');
 const Dominio = require('../models/Dominio');
 
 let obtenerDominio = async (req, res, next) => {
-    //TODO
-    //Opción para obtener el ID desde el token y el dominio desde la URL
-    let id = req.params.id;
-    let domain = req.query.d;
-    //Verifica que el ID y el nombre de dominio vengan en la petición
-    if(!id || !domain){
-        return res.status(400).json({
-            error : {
-                msg : 'El ID del usuario y el nombre de dominio son necesarios'
-            }
-        });
-    }
+    //Obtener el id del token
+    let Usr_ID = req.usuario.Usr_ID;
+    let Dom_ID = req.id;
     try {
         //Busca el dominio del usuario
         const dominio = await Dominio.findOne({
             where: {
-                id_usuario : id,
-                domain
+                Usr_ID,
+                Dom_ID
             }
         });
         //Verifica que el usuario tenga el dominio registrado
@@ -45,24 +36,14 @@ let obtenerDominio = async (req, res, next) => {
 }
 
 let obtenerDominios = async (req, res, next) => {
-    //TODO
-    //Opción para obtener ID desde el token
-    let id = req.query.id;
-    let domain = req.query.d;
-    //Verifica que el ID y el nombre de dominio vengan en la petición
-    if(!id || !domain){
-        return res.status(400).json({
-            error : {
-                msg : 'El ID del usuario y el nombre de dominio son necesarios'
-            }
-        });
-    }
+    //Obtener el id del token
+    let Usr_ID = req.usuario.Usr_ID;
     try {
         //Busca dominios en la BD
         const dominios = await Dominio.findAll({
+            attributes: ['Dom_ID', 'Usr_ID', 'Dom_Name'],
             where: {
-                id_usuario : id,
-                domain
+                Usr_ID
             }
         });
         //Regresar dominios
@@ -80,10 +61,8 @@ let obtenerDominios = async (req, res, next) => {
 }
 
 let registrarDominio = async (req, res, next) => {
-    //TODO
-    //Opción para obtener el id del token
-    // let Usr_id = req.Usr_ID;
-    let Usr_ID = req.body.id;
+    //Obtener el id del token
+    let Usr_ID = req.usuario.Usr_ID;
     let { gd, mp } = req.body;
     //Verificar datos
     try {
@@ -96,23 +75,16 @@ let registrarDominio = async (req, res, next) => {
             }
         });
         console.log(response.status);
-        //Evaluar respuesta
-        if(response.status != 200){
-            res.status(response.status).json({
-                error : response.data
-            });
-        }
     } catch (error) {
         console.log(error.response.status);
-        console.log(error.response.statusText);
-        console.log(error.response.data);
-        res.status(error.response.status).json({
+        return res.status(error.response.status).json({
             error : error.response.data,
-            step : 'Verify data'
+            step : 'Verify GoDaddy data'
         });
     }
     //TODO
     //Cobrar al usuario 
+    //Guardar datos de transaccion en BD
     let pago = req.body.pago;
     if(pago){
         //Enviar petición de compra a GoDaddy
@@ -126,48 +98,37 @@ let registrarDominio = async (req, res, next) => {
                 }
             });
             console.log(response.status);
-            //Evaluar respuesta
-            if(response.status != 200){
-                res.status(response.status).json({
-                    error : response.data
-                });
-            }
         } catch (error) {
             console.log(error.response.status);
-            console.log(error.response.statusText);
-            console.log(error.response.data);
-            res.status(error.response.status).json({
+            return res.status(error.response.status).json({
                 error : error.response.data,
-                step : 'Registrar domain'
+                step : 'Register domain'
             });
         }
-        //TODO
-        //Guardar datos de transaccion en BD
         //Guardar datos de dominio en BD
         let dmn = {
             Usr_ID,
-            Dom_Name : gd.domain,
+            Dom_Name : gd.domain
         }
         try {
             const dominio = new Dominio(dmn);
             await dominio.save();
             //Regresar datos al usuario
-            res.status(200).json({
+            return res.status(200).json({
                 dominio
             });
         } catch (error) {
             //Regresar datos de error al usuario
             console.log(error)
-            res.status(500).json({
+            return res.status(500).json({
                 error : {
                     msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
                 },
-                step : 'Registrar user domain'
+                step : 'Register domain in database'
             });
         }
     } else {
-        //Guardar datos en BD en caso de ser necesario
-        res.status(400).json({
+        return res.status(400).json({
             error : {
                 msg : 'No se pudo procesar el pago, intente de nuevo más tarde o comuníquese con un asesor'
             }

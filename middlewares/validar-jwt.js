@@ -1,5 +1,6 @@
 const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
+const Usuario = require('../models/Usuario')
 //Importar modelo
 
 const validarJWT = async (req = request, res = response, next) => {
@@ -12,8 +13,8 @@ const validarJWT = async (req = request, res = response, next) => {
         });
     }
     try {
-        const { Usr_ID } = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
-        const usuario = await Usuario.findByID(Usr_ID);
+        const Usr_ID = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
+        const usuario = await Usuario.findByPk(Usr_ID.uid);
         if(!usuario) {
             return res.status(404).json({
                 error: {

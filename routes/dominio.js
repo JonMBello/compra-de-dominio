@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const {validarJWT} = require('../middlewares/validar-jwt');
 const {
     obtenerDominio,
     obtenerDominios,
@@ -7,9 +8,9 @@ const {
     eliminarDominio
 } = require('../controllers/dominio');
 
-router.get('/', obtenerDominios);
-router.get('/:id', obtenerDominio);
-router.post('/', registrarDominio);
+router.get('/', [validarJWT], obtenerDominios);
+router.get('/:id', [validarJWT], obtenerDominio);
+router.post('/', [validarJWT], registrarDominio);
 router.put('/:id', modificarDominio);
 router.delete('/:id', eliminarDominio);
 
