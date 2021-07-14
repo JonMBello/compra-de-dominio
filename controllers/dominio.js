@@ -1,6 +1,5 @@
 const axios = require('axios');
-
-const Dominio = require('../models/Dominio')
+const Dominio = require('../models/Dominio');
 
 let obtenerDominio = async (req, res, next) => {
     //TODO
@@ -108,12 +107,13 @@ let registrarDominio = async (req, res, next) => {
         console.log(error.response.statusText);
         console.log(error.response.data);
         res.status(error.response.status).json({
-            error : error.response.data
+            error : error.response.data,
+            step : 'Verify data'
         });
     }
     //TODO
     //Cobrar al usuario 
-    let pago = req.pago;
+    let pago = req.body.pago;
     if(pago){
         //Enviar petición de compra a GoDaddy
         try {
@@ -137,44 +137,16 @@ let registrarDominio = async (req, res, next) => {
             console.log(error.response.statusText);
             console.log(error.response.data);
             res.status(error.response.status).json({
-                error : error.response.data
+                error : error.response.data,
+                step : 'Registrar domain'
             });
         }
-        //TODO  
-        //Buscar datos del dominio
-        let domGD;
-        try {
-            domGD = await axios ({
-                method : 'get',
-                url : `${process.env.URL}/v1/domains/${gd.domain}`,
-                headers : {
-                    'Authorization' : process.env.Auth
-                }
-            });
-            console.log(domGD.status);
-            console.log(domGD.data);
-            //Evaluar respuesta
-            if(domGD.status != 200){
-                res.status(domGD.status).json({
-                    error : domGD.data
-                });
-            }
-        } catch (error) {
-            console.log(error.response.status);
-            console.log(error.response.statusText);
-            console.log(error.response.data);
-            res.status(error.response.status).json({
-                error : error.response.data
-            });
-        }
-        //Guardar datos en BD
+        //TODO
+        //Guardar datos de transaccion en BD
+        //Guardar datos de dominio en BD
         let dmn = {
             Usr_ID,
-            Dom_Name : domGD.data.domain,
-            Dom_Status : domGD.data.status,
-            Dom_Expires : domGD.data.expires,
-            Dom_RenewDeadline : domGD.data.renewDeadline,
-            Dom_TransferAwayEligibleAt : domGD.data.transferAwayEligibleAt,
+            Dom_Name : gd.domain,
         }
         try {
             const dominio = new Dominio(dmn);
@@ -185,19 +157,21 @@ let registrarDominio = async (req, res, next) => {
             });
         } catch (error) {
             //Regresar datos de error al usuario
+            console.log(error)
             res.status(500).json({
                 error : {
                     msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
-                }
+                },
+                step : 'Registrar user domain'
             });
         }
-    }
-    //Guardar datos en BD en caso de ser necesario
-    try {
-        
-        //Regresar datos de error al usuario
-    } catch (error) {
-        
+    } else {
+        //Guardar datos en BD en caso de ser necesario
+        res.status(400).json({
+            error : {
+                msg : 'No se pudo procesar el pago, intente de nuevo más tarde o comuníquese con un asesor'
+            }
+        });
     }
 }
 

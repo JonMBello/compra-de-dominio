@@ -3,6 +3,11 @@ let {db} = require('../db');
 const Usuario = require('./Usuario');
 
 const Dominio = db.define('Dominio',{
+    Dom_ID : {
+        type : DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true,
+    },
     Usr_ID:{
         type : DataTypes.BIGINT,
         references : {
@@ -29,6 +34,9 @@ const Dominio = db.define('Dominio',{
     Dom_TransferAwayEligibleAt:{
         type : 'TIMESTAMP'
     }
+},
+{
+    tableName: 'Dominio'
 });
 
 module.exports = Dominio;
