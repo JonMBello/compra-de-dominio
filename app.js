@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+const mercadopago = require("mercadopago");
 var routes = require('./routes');
 const {conectarBD} = require('./db');
 
@@ -11,6 +12,10 @@ var app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//Configuración de mercado pago
+mercadopago.configurations.setAccessToken(process.env.MP); 
+
 //Conexión a base datos
 conectarBD();
 

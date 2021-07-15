@@ -1,4 +1,5 @@
 const axios = require('axios');
+const mercadopago = require('mercadopago');
 const Dominio = require('../models/Dominio');
 
 let obtenerDominio = async (req, res, next) => {
@@ -115,10 +116,8 @@ let obtenerDominios = async (req, res, next) => {
 }
 
 let crearPedido = async (req, res, next) => {
-    //Obtener el id del token
-    let Usr_ID = req.usuario.Usr_ID;
     let { gd, mp } = req.body;
-    //Verificar datos
+    //Verificar datos GoDaddy
     try {
         const response = await axios ({
             method : 'post',
@@ -136,11 +135,36 @@ let crearPedido = async (req, res, next) => {
             step : 'Verify GoDaddy data'
         });
     }
-    //TODO
-    //Cobrar al usuario 
+    //Crear pedido
+    let preference = {
+        items : [{
+            title : mp.title,
+            unit_price : Number(mp.price),
+            quantity : Number(mp.quantity)
+        }],
+        back_urls : {
+            "success" : mp.pageSuccess,
+            "failure" : mp.pageFailure,
+            "pending" : mp.PagePending
+        },
+        auto_return : 'approved'
+    }
+    mercadopago.preferences.create(preference)
+        .then(function (response) {
+            res.json({id :response.body.id})
+        })
+        .catch(function (error) {
+            console.log(error);
+            return res.status(500).json({
+                error,
+                step : 'Create MercadoPago preference'
+            });
+        });
+
 }
 
 let registrarDominio = async (req, res, next) => {
+    //TODO
     //Guardar datos de transaccion en BD
     let pago = req.body.pago;
     if(pago){
@@ -282,6 +306,7 @@ let eliminarDominio = async (req, res, next) => {
 module.exports = {
     obtenerDominio,
     obtenerDominios,
+    crearPedido,
     registrarDominio,
     modificarDominio,
     renovarDominio,

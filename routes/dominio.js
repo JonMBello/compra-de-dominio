@@ -5,11 +5,13 @@ const {
     obtenerDominios,
     registrarDominio,
     modificarDominio,
-    eliminarDominio
+    eliminarDominio,
+    crearPedido
 } = require('../controllers/dominio');
 
 router.get('/', [validarJWT], obtenerDominios);
 router.get('/:id', [validarJWT], obtenerDominio);
+router.post('/crear-pedido', [validarJWT], crearPedido)
 router.post('/', [validarJWT], registrarDominio);
 router.put('/:id', modificarDominio);
 router.delete('/:id', eliminarDominio);
