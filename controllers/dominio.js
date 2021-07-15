@@ -4,35 +4,89 @@ const Dominio = require('../models/Dominio');
 let obtenerDominio = async (req, res, next) => {
     //Obtener el id del token
     let Usr_ID = req.usuario.Usr_ID;
-    let Dom_ID = req.id;
+    let Dom_Name = req.params.id;
+    let dominio;
     try {
         //Busca el dominio del usuario
-        const dominio = await Dominio.findOne({
+        dominio = await Dominio.findOne({
             where: {
                 Usr_ID,
-                Dom_ID
+                Dom_Name
             }
         });
         //Verifica que el usuario tenga el dominio registrado
         if(!dominio){ 
             return res.status(404).json({
                 error: {
-                    msg : `Este usuario no tiene el dominio ${domain} registrado`
+                    msg : `Este usuario no tiene el dominio ${Dom_Name} registrado`
                 }
             });
         }
-        //Regresar dominio
-        res.status(200).json({
-            dominio
-        });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             error : {
-                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor'
+                msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor',
+                step : 'Database search'
             }
         });
     }
+    //Busca el dominio en GoDaddy
+    let response;
+    try {
+        response = await axios ({
+            method : 'get',
+            url : `${process.env.URL}/v1/domains/${Dom_Name}`,
+            headers : {
+                'Authorization' : process.env.Auth
+            }
+        });
+        console.log(response.status);
+    } catch (error) {
+        console.log(error.response.status);
+        return res.status(error.response.status).json({
+            error : error.response.data,
+            step : 'GoDaddy search'
+        });
+    }
+    let data = {};
+    let modificado = false;
+    if(dominio.Dom_Status != response.data.status) {
+        data.Dom_Status = response.data.status;
+        modificado = true;
+    }
+    if(dominio.Dom_Expires != response.data.expires) {
+        data.Dom_Expires = response.data.expires;
+        modificado = true;
+    }
+    if(dominio.Dom_RenewDeadline != response.data.renewDeadline) {
+        data.Dom_RenewDeadline = response.data.renewDeadline;
+        modificado = true;
+    }
+    if(dominio.Dom_TransferAwayEligibleAt != response.data.transferAwayEligibleAt) {
+        data.Dom_TransferAwayEligibleAt = response.data.transferAwayEligibleAt;
+        modificado = true;
+    }
+    //Verifica si hay cambios de la BD de GD con la de RF
+    if(modificado) {
+        //Guardar cambios de GoDaddy en BD
+        try {
+            console.log('Actualizando BD');
+            await dominio.update(data);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                error : {
+                    msg : 'Error del sistema, intente de nuevo más tarde o comuníquese con un asesor',
+                    step : 'Database update'
+                }
+            });
+        }
+    }
+    //Regresar datos al usuario
+    return res.status(200).json({
+        dominio
+    });
 }
 
 let obtenerDominios = async (req, res, next) => {
@@ -60,7 +114,7 @@ let obtenerDominios = async (req, res, next) => {
     }
 }
 
-let registrarDominio = async (req, res, next) => {
+let crearPedido = async (req, res, next) => {
     //Obtener el id del token
     let Usr_ID = req.usuario.Usr_ID;
     let { gd, mp } = req.body;
@@ -84,6 +138,9 @@ let registrarDominio = async (req, res, next) => {
     }
     //TODO
     //Cobrar al usuario 
+}
+
+let registrarDominio = async (req, res, next) => {
     //Guardar datos de transaccion en BD
     let pago = req.body.pago;
     if(pago){
@@ -127,6 +184,8 @@ let registrarDominio = async (req, res, next) => {
                 step : 'Register domain in database'
             });
         }
+        //TODO
+        //Apuntar registros DNS a servidor de AWS
     } else {
         return res.status(400).json({
             error : {
